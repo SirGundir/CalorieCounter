@@ -1,0 +1,32 @@
+<!-- templates/CalorieCounter/home.html -->
+
+{% extends 'CalorieCounter1/base.html' %}
+
+{% block content %}
+    <h1 class="text-center mt-4">Добро пожаловать на мой сайт!</h1>
+    <p class="text-center">Это лучший счетчик каллорий.</p>
+    <form action="{% url 'food_search' %}" method="get" class="navbar-form navbar-right" role="search">
+    <div class="form-group">
+        {% csrf_token %}
+        <input type="text" name="query" class="form-control" placeholder="Введите название блюда">
+    </div>
+    <button type="Submit" class="btn btn-default">Поиск</button>
+    </form>
+    <!-- Вывод результатов поиска, если они есть -->
+    {% if food_list %}
+        <h2>Результаты поиска:</h2>
+        <ul>
+            {% for food in food_list %}
+                <li>
+                    <b>{{ food.0 }}</b><br>
+                    Калорий: {{ food.1 }} ккал<br>
+                    Белки: {{ food.2 }} г<br>
+                    Жиры: {{ food.3 }} г<br>
+                    Углеводы: {{ food.4 }} г
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Нет результатов поиска.</p>
+    {% endif %}
+{% endblock %}
