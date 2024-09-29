@@ -14,19 +14,83 @@
     </form>
     <!-- Вывод результатов поиска, если они есть -->
     {% if food_list %}
-        <h2>Результаты поиска:</h2>
-        <ul>
-            {% for food in food_list %}
-                <li>
-                    <b>{{ food.0 }}</b><br>
-                    Калорий: {{ food.1 }} ккал<br>
-                    Белки: {{ food.2 }} г<br>
-                    Жиры: {{ food.3 }} г<br>
-                    Углеводы: {{ food.4 }} г
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Нет результатов поиска.</p>
-    {% endif %}
+    <h2>Результаты поиска:</h2>
+    <ul id="food-results">
+        {% for food in food_list %}
+            <li data-food="{{ food.0 }}" data-calories="{{ food.1 }}" data-protein="{{ food.2 }}" data-fat="{{ food.3 }}" data-carbs="{{ food.4 }}">
+                <b>{{ food.0 }}</b><br>
+                Калорий: {{ food.1 }} ккал<br>
+                Белки: {{ food.2 }} г<br>
+                Жиры: {{ food.3 }} г<br>
+                Углеводы: {{ food.4 }} г<br>
+                <button class="add-to-list">Добавить</button>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет результатов поиска.</p>
+{% endif %}
+
+<!-- Общий список выбранных ингредиентов -->
+<h2>Выбранные ингредиенты:</h2>
+<ul id="selected-food-list">
+    <!-- Здесь будут появляться выбранные элементы -->
+</ul>
+
+<script>
+function saveSelectedFoods() {
+    const selectedFoodList = document.getElementById('selected-food-list');
+    const items = selectedFoodList.querySelectorAll('li');
+    const foodArray = [];
+
+    items.forEach(item => {
+        foodArray.push(item.innerHTML);
+    });
+
+    localStorage.setItem('selectedFoods', JSON.stringify(foodArray));
+}
+
+
+function loadSelectedFoods() {
+    const selectedFoodList = document.getElementById('selected-food-list');
+    const savedFoods = JSON.parse(localStorage.getItem('selectedFoods'));
+
+    if (savedFoods) {
+        savedFoods.forEach(food => {
+            const li = document.createElement('li');
+            li.innerHTML = food;
+            selectedFoodList.appendChild(li);
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const foodResults = document.getElementById('food-results');
+    const selectedFoodList = document.getElementById('selected-food-list');
+
+    loadSelectedFoods();
+
+    if (foodResults) {
+        foodResults.addEventListener('click', function(e) {
+            if (e.target.classList.contains('add-to-list')) {
+                const foodItem = e.target.closest('li');
+                const foodName = foodItem.getAttribute('data-food');
+                const calories = foodItem.getAttribute('data-calories');
+                const protein = foodItem.getAttribute('data-protein');
+                const fat = foodItem.getAttribute('data-fat');
+                const carbs = foodItem.getAttribute('data-carbs');
+
+
+                const newFoodItem = document.createElement('li');
+                newFoodItem.innerHTML = `<b>${foodName}</b> - Калорий: ${calories} ккал, Белки: ${protein} г, Жиры: ${fat} г, Углеводы: ${carbs} г`;
+                selectedFoodList.appendChild(newFoodItem);
+
+
+                saveSelectedFoods();
+            }
+        });
+    }
+});
+</script>
+
 {% endblock %}
